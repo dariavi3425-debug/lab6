@@ -3,15 +3,25 @@ require_once 'functions.php';
 
 $error = '';
 
+// Фіксовані дані для входу
+$correct_login = 'admin';
+$correct_pass = '12345';
+
+// Обробка авторизації
 if (isset($_POST['login_btn'])) {
-    if (!login_admin($_POST['username'] ?? '', $_POST['password'] ?? '')) {
-        $error = 'Невірний логін або пароль!';
-    } else {
+    $user = trim($_POST['username'] ?? '');
+    $pass = trim($_POST['password'] ?? '');
+
+    if ($user === $correct_login && $pass === $correct_pass) {
+        $_SESSION['is_admin'] = true;
         header("Location: admin.php");
         exit();
+    } else {
+        $error = "Невірний логін або пароль! Введено: '$user'";
     }
 }
 
+// Обробка дій
 if (is_admin_logged_in()) {
     $action = $_GET['action'] ?? '';
 
@@ -50,6 +60,7 @@ if (is_admin_logged_in()) {
         input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; background: #3498db; color: white; padding: 10px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
         .error { color: #e74c3c; text-align: center; margin-bottom: 15px; font-weight: bold; }
+        .hint { background: #e8f4fc; padding: 8px; border-radius: 4px; font-size: 13px; color: #2980b9; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -84,19 +95,26 @@ if (is_admin_logged_in()) {
 
     <div class="login-box">
         <h2 style="text-align: center; margin-top:0;">Вхід в адмін-панель</h2>
+        
         <?php if ($error): ?><div class="error"><?php echo $error; ?></div><?php endif; ?>
 
         <form action="admin.php" method="POST">
             <div class="form-group">
                 <label>Логін:</label>
-                <input type="text" name="username" required placeholder="admin">
+                <input type="text" name="username" required>
             </div>
             <div class="form-group">
                 <label>Пароль:</label>
-                <input type="password" name="password" required placeholder="secretpassword">
+                <input type="password" name="password" required>
             </div>
             <button type="submit" name="login_btn">Увійти</button>
         </form>
+
+        <div class="hint">
+            <strong>Дані для входу:</strong><br>
+            Логін: <code>admin</code><br>
+            Пароль: <code>12345</code>
+        </div>
     </div>
 
 <?php endif; ?>
